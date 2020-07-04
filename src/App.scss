@@ -1,0 +1,11 @@
+@import "./utils/reset";
+
+:root {
+	font-size: 20px;
+	--primary: #0096ff;
+	--primary-dark: #0069cb;
+	--secondary: #ad6153;
+}
+body {
+	background: var(--primary-dark);
+}

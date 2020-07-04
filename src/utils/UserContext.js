@@ -14,18 +14,36 @@ const { Provider } = UserContext;
 /**
  * Get and set user state
  * @param {{ _id: any, username: string, auth: boolean }} userState
- * @param {{ type: "register" | "login" | "logout" | "user-status", user: {_id, password, email, username, auth: boolean} }} action
+ * @param {{ type: "register" | "login" | "logout" | "user-status", user: {_id, password, password2?, email, username, auth: boolean} }} action
  */
 const reducer = async (userState, action) => {
 	const { type, user } = action;
 	switch (type) {
-		case "login":
+		case "login": {
 			const res = await login({
 				username: user.username,
 				email: user.email,
 				password: user.password
 			});
-			return { username: res.user.username, _id: res.user._id, auth: res.user.auth };
+			return res.user;
+		}
+		case "register": {
+			const res = await register({
+				username: user.username,
+				email: user.email,
+				password: user.password,
+				password2: user.password2
+			});
+			return res.user;
+		}
+		case "logout": {
+			const res = await logout();
+			return res.user;
+		}
+		case "user-status": {
+			const res = await getUserStatus();
+			return res.user;
+		}
 		default:
 			break;
 	}

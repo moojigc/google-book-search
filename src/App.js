@@ -1,15 +1,27 @@
-import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.scss";
-import Axios from "axios";
+import Search from "./pages/Search";
+import Navbar from "./components/Navbar";
+import { ThemeProvider } from "@material-ui/core/styles/";
+import theme from "./utils/theme";
+import { BookProvider } from "./utils/BookContext";
 
 function App() {
-	useEffect(() => {
-		Axios.get("/api/books/harry potter")
-			.then((res) => console.log(res.data))
-			.catch(console.error);
-	});
-	return <div>hello</div>;
+	return (
+		<Router>
+			<ThemeProvider theme={theme}>
+				<BookProvider>
+					<Navbar />
+					<Switch>
+						<Route exact path="/">
+							<Search />
+						</Route>
+					</Switch>
+				</BookProvider>
+			</ThemeProvider>
+		</Router>
+	);
 }
 
 export default App;
