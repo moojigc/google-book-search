@@ -1,4 +1,4 @@
-const { KEY } = process.env.GOOGLE_KEY || require("../config.json");
+const KEY = process.env.GOOGLE_KEY || require("../config.json").KEY;
 const axios = require("axios").default;
 
 /**
