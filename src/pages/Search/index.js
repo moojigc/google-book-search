@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
-import { Grid, Container, TextField, Button, makeStyles } from "@material-ui/core";
-import Axios from "axios";
+import React, { useState, useEffect } from "react";
+import { Grid, Container, TextField, Button, makeStyles, useMediaQuery } from "@material-ui/core";
 import Wrapper from "../../components/Wrapper";
 import { useBookContext } from "../../utils/BookContext";
+import bookAPI from "../../utils/bookAPI";
+import SearchResult from "../../components/SearchResult";
 
 const useStyles = makeStyles((theme) => ({
 	button: {
@@ -16,20 +17,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Search = () => {
+	const isMobile = useMediaQuery("(max-width: 997px)");
 	const classes = useStyles();
-	const [search, setSearch] = useState("");
-	const [books, dispatchBooks] = useBookContext();
+	const [search, setSearch] = useState("rezero");
+	const [results, setResults] = useState([]);
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-		const { data } = await Axios({
-			url: `/api/books/${search}`,
-			method: "GET"
-		});
-		dispatchBooks({ books: data.items });
+		const books = await bookAPI({ action: "search", search: search });
+		setResults(books.items);
 		console.log(books);
 	};
 	return (
-		<Container maxWidth="lg">
+		<Container maxWidth={isMobile ? "xl" : "lg"}>
 			<Wrapper>
 				<Grid container>
 					<Grid item xs={12}>
@@ -57,8 +56,12 @@ const Search = () => {
 					</Grid>
 				</Grid>
 			</Wrapper>
+			{results.length ? (
+				<Wrapper>
+					<SearchResult books={results} />
+				</Wrapper>
+			) : null}
 		</Container>
 	);
 };
-
 export default Search;

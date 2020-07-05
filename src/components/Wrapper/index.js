@@ -3,10 +3,10 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyle = makeStyles((theme) => ({
 	wrapper: {
-		background: theme.palette.secondary.dark,
+		background: theme.palette.primary.dark,
 		borderRadius: "0.25rem",
 		padding: "1rem",
-		margin: "1rem"
+		margin: "1rem 0"
 	}
 }));
 /**
