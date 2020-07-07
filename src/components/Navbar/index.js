@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -18,6 +18,9 @@ import {
 	Link
 } from "@material-ui/core";
 import { ExitToApp } from "@material-ui/icons";
+import { UserContext } from "../../utils/UserContext";
+import { FlashContext } from "../../utils/FlashContext";
+import userAPI from "../../utils/userAPI";
 
 const useStyles = makeStyles((theme) => ({
 	nav: {
@@ -31,6 +34,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Navbar() {
+	const { user, setUser } = useContext(UserContext);
+	const { setFlash } = useContext(FlashContext);
 	const history = useHistory();
 	const classes = useStyles();
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -41,38 +46,39 @@ export default function Navbar() {
 
 		setDrawerOpen(!drawerOpen);
 	};
-	const logout = () => {};
+	const logout = async () => {
+		let res = await userAPI({ action: "logout" });
+		setUser(res.user);
+		setFlash(res.flash);
+		history.push("/login");
+	};
 	const AppDrawer = () => {
 		return (
 			<Drawer variant="temporary" anchor="left" open={drawerOpen} onClose={toggleDrawer}>
 				<div className={classes.drawer}>
 					<List>
-						<ListItem button component={A} to="/profile" key="my-profile">
-							<ListItemIcon>
-								<AccountCircle />
-							</ListItemIcon>
-							<ListItemText>
-								<Link color="textPrimary" component={A} to="/profile">
-									My Profile
-								</Link>
-							</ListItemText>
-						</ListItem>
+						{user.auth ? (
+							<ListItem button component={A} to="/mybooks" key="mybooks">
+								<ListItemIcon>
+									<AccountCircle />
+								</ListItemIcon>
+								<ListItemText>My Books</ListItemText>
+							</ListItem>
+						) : null}
 						<ListItem button component={A} to="/search" key="search-books">
 							<ListItemIcon>
 								<Search />
 							</ListItemIcon>
 							<ListItemText>Search Books</ListItemText>
 						</ListItem>
-						<ListItem button component={A} to="/logout" key="logout">
-							<ListItemIcon>
-								<ExitToApp />
-							</ListItemIcon>
-							<ListItemText>
-								<Link color="textPrimary" component="div" onClick={logout}>
-									Log Out
-								</Link>
-							</ListItemText>
-						</ListItem>
+						{user?.auth ? (
+							<ListItem button key="logout" onClick={logout}>
+								<ListItemIcon>
+									<ExitToApp />
+								</ListItemIcon>
+								<ListItemText>Log Out</ListItemText>
+							</ListItem>
+						) : null}
 					</List>
 				</div>
 			</Drawer>
@@ -91,11 +97,13 @@ export default function Navbar() {
 						<MenuIcon />
 					</IconButton>
 					<Typography variant="h6">Google Books Search</Typography>
-					<Button color="inherit">
-						<Link color="textPrimary" component={A} to="/login">
-							Login
-						</Link>
-					</Button>
+					{!user.auth ? (
+						<Button color="inherit">
+							<Link color="textPrimary" component={A} to="/login">
+								Login
+							</Link>
+						</Button>
+					) : null}
 				</Toolbar>
 			</AppBar>
 		</div>

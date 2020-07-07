@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -14,10 +14,11 @@ import Wrapper from "../../components/Wrapper";
 import Switch from "@material-ui/core/Switch";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { useUserContext } from "../../utils/UserContext";
+import { useUserContext, UserContext } from "../../utils/UserContext";
 import Alert from "../../components/Alert";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { FlashContext } from "../../utils/FlashContext";
 
 const useStyles = makeStyles((theme) => ({
 	info: {
@@ -37,16 +38,15 @@ const Register = () => {
 		email: ""
 	});
 	const history = useHistory();
-	const [flash, setFlash] = useState(null);
+	const { flash, setFlash } = useContext(FlashContext);
 	// @ts-ignore
-	const [user, dispatchUser] = useUserContext();
+	const { user, setUser } = useContext(UserContext);
 	const handleRegister = async () => {
 		let res = await userApi({
 			action: "register",
 			userDetails: userDetails
 		});
 		console.log(res);
-		// dispatchUser({ user: res.user });
 		setFlash(res.flash);
 		if (res.redirect === "/login") history.push(res.redirect);
 	};
@@ -116,6 +116,7 @@ const Register = () => {
 								fullWidth
 								id="password"
 								variant="filled"
+								type="password"
 								label="Password"
 							/>
 						</Grid>
@@ -133,6 +134,7 @@ const Register = () => {
 								}}
 								fullWidth
 								id="password"
+								type="password"
 								variant="filled"
 								label="Confirm Password"
 							/>
@@ -154,7 +156,7 @@ const Register = () => {
 					</Grid>
 				</form>
 			</Wrapper>
-			{flash ? <Alert type={flash.type}>{flash.message}</Alert> : null}
+			{flash.message ? <Alert type={flash.type}>{flash.message}</Alert> : null}
 		</Container>
 	);
 };

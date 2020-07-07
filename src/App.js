@@ -6,17 +6,35 @@ import Navbar from "./components/Navbar";
 import { ThemeProvider } from "@material-ui/core/styles/";
 import theme from "./utils/theme";
 import { BookProvider } from "./utils/BookContext";
-import { UserProvider } from "./utils/UserContext";
+import { Provider as UserProvider } from "./utils/UserContext";
+import { Provider as FlashProvider } from "./utils/FlashContext";
 import Login from "./pages/Login";
-import UserStatus from "./components/UserStatus";
 import Register from "./pages/Register";
 import BookCollection from "./pages/BookCollection";
+import userAPI from "./utils/userAPI";
 
 function App() {
+	const [user, setUser] = React.useState({
+		auth: false,
+		username: "Guest",
+		_id: ""
+	});
+	const [flash, setFlash] = React.useState({
+		message: "",
+		type: "error" || "success"
+	});
+
+	React.useEffect(() => {
+		userAPI({ action: "user-status" }).then((res) => {
+			console.log(res);
+			setUser(res);
+		});
+	}, []);
+
 	return (
 		<Router>
-			<UserProvider>
-				<UserStatus>
+			<UserProvider value={{ user, setUser }}>
+				<FlashProvider value={{ flash, setFlash }}>
 					<ThemeProvider theme={theme}>
 						<BookProvider>
 							<Navbar />
@@ -39,7 +57,7 @@ function App() {
 							</Switch>
 						</BookProvider>
 					</ThemeProvider>
-				</UserStatus>
+				</FlashProvider>
 			</UserProvider>
 		</Router>
 	);

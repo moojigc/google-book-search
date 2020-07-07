@@ -21,15 +21,11 @@ const useStyles = makeStyles((theme) => ({
 	button: {
 		color: theme.palette.secondary.contrastText,
 		marginTop: "1rem"
-	},
-	input: {
-		background: "white",
-		borderRadius: "0.15rem"
 	}
 }));
 
 const Search = () => {
-	const [_, dispatchUser] = useUserContext();
+	// const [_, dispatchUser] = useUserContext();
 	const [searchSubmitted, setSearchSubmitted] = useState(false);
 	const isMobile = useMediaQuery("(max-width: 997px)");
 	const classes = useStyles();
@@ -39,21 +35,19 @@ const Search = () => {
 		event.preventDefault();
 		setSearchSubmitted(true);
 		setResults([]);
-		let user = await userAPI({ action: "user-status" });
+		// let user = await userAPI({ action: "user-status" });
 		let books = await bookAPI({ action: "search", search: search });
 		setResults(books.items);
-		dispatchUser({ user: user });
+		// dispatchUser({ user: user });
 	};
 	return (
-		<Container maxWidth={isMobile ? "xl" : "lg"}>
+		<Container disableGutters={true} fixed={isMobile} maxWidth={isMobile ? "xl" : "lg"}>
 			<Wrapper>
 				<Grid container>
 					<Grid item xs={12}>
 						<form>
 							<TextField
-								className={classes.input}
 								type="text"
-								color="primary"
 								onChange={(event) => setSearch(event.target.value)}
 								name="book-search"
 								id="google-book-search"

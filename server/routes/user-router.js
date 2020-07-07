@@ -35,8 +35,15 @@ module.exports = (router) => {
 				redirect: "/register"
 			});
 			return;
-		}
-		if (body.password === body.password2) {
+		} else if (!/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/.test(body.email)) {
+			res.json({
+				...flash("Not a valid email.", "error"),
+				redirect: "/register"
+			});
+			return;
+		} else if (body.password !== body.password2) {
+			res.json({ ...flash("Passwords must match!", "error"), redirect: "/register" });
+		} else {
 			let user = new User({
 				username: body.username,
 				email: body.email,
@@ -51,17 +58,20 @@ module.exports = (router) => {
 				});
 			} catch (error) {
 				let fields = error.keyValue ? Object.keys(error.keyValue) : null;
-				let field = fields > 0 ? fields[0] : null;
+				let field = fields.length > 0 ? fields[0] : null;
 				field
 					? res.json({
-							...flash(`User with that ${field} already exists!`, "error"),
+							...flash(
+								`${
+									field.charAt(0).toUpperCase() + field.substring(1)
+								} already taken.`,
+								"error"
+							),
 							success: false,
 							redirect: "/register"
 					  })
 					: serverError(res);
 			}
-		} else {
-			res.json({ ...flash("Passwords must match!", "error"), redirect: "/register" });
 		}
 	});
 	router.post("/api/login", (req, res, next) => {

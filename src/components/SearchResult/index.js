@@ -4,14 +4,13 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { makeStyles, Box, Divider, CircularProgress } from "@material-ui/core";
+import { makeStyles, Box, Divider, CircularProgress, useMediaQuery } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
 import Grid from "@material-ui/core/Grid";
 import Chip from "@material-ui/core/Chip";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import bookAPI from "../../utils/bookAPI";
-import { useUserContext } from "../../utils/UserContext";
 import SaveBook from "../SaveBook";
 import Link from "@material-ui/core/Link";
 
@@ -45,8 +44,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SearchResult = ({ books }) => {
-	const [user] = useUserContext();
 	const classes = useStyles();
+	const isMobile = useMediaQuery("(max-width: 997px)");
 
 	return (
 		<div style={{ width: "100%" }}>
@@ -86,32 +85,39 @@ const SearchResult = ({ books }) => {
 								<AccordionDetails>
 									<Grid container spacing={2}>
 										<Grid item className={classes.description}>
-											<SaveBook book={book} classes={classes} />
-											{saleInfo.saleability === "FOR_SALE" ? (
-												<Chip
-													className={classes.priceChip}
-													clickable
-													label={
-														"$" +
-														saleInfo.retailPrice?.amount +
-														" - Buy now from Google"
-													}
-													component="a"
-													href={saleInfo.buyLink}
-													rel="noreferrer"
-													target="_blank"
-												/>
-											) : null}
-											{volumeInfo.averageRating ? (
-												<Rating
-													name="score out of 5"
-													style={{ opacity: 1 }}
-													disabled
-													value={volumeInfo.averageRating}
-												/>
-											) : (
-												<Chip color="secondary" label="No rating" />
-											)}
+											<Box
+												display={isMobile ? "grid" : "flex"}
+												gridTemplateColumns="1fr"
+												gridGap="0.5rem"
+												width="100%"
+												justifyContent="space-between">
+												<SaveBook book={book} classes={classes} />
+												{saleInfo.saleability === "FOR_SALE" ? (
+													<Chip
+														className={classes.priceChip}
+														clickable
+														label={
+															"$" +
+															saleInfo.retailPrice?.amount +
+															" - Buy now from Google"
+														}
+														component="a"
+														href={saleInfo.buyLink}
+														rel="noreferrer"
+														target="_blank"
+													/>
+												) : null}
+												{volumeInfo.averageRating ? (
+													<Rating
+														name="score out of 5"
+														style={{ opacity: 1 }}
+														disabled
+														value={volumeInfo.averageRating}
+													/>
+												) : (
+													<Chip color="secondary" label="No rating" />
+												)}
+											</Box>
 										</Grid>
 										<Grid item>
 											<div className={classes.details}>

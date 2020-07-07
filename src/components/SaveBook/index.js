@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Chip, CircularProgress } from "@material-ui/core";
 import { Add as AddIcon } from "@material-ui/icons";
-import { useUserContext } from "../../utils/UserContext";
+import { UserContext } from "../../utils/UserContext";
 import { Link as A } from "react-router-dom";
 import bookAPI from "../../utils/bookAPI";
 
 const SaveBook = ({ book, classes }) => {
 	const [flash, setFlash] = useState({});
 	const [auth, setAuth] = useState(false);
-	const [user] = useUserContext();
+	const { user, setUser } = useContext(UserContext);
 	const [saved, setSaved] = useState(false);
 	const handleSaveBook = async () => {
 		let res = await bookAPI({
@@ -19,7 +19,8 @@ const SaveBook = ({ book, classes }) => {
 				authors: book.volumeInfo.authors,
 				googleId: book.id,
 				image: book.volumeInfo.imageLinks?.large || book.volumeInfo.imageLinks?.thumbnail,
-				link: book.volumeInfo.previewLink
+				link: book.volumeInfo.previewLink,
+				description: book.volumeInfo.description
 			}
 		});
 		setSaved(res.saved);

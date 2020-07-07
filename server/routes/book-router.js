@@ -18,15 +18,6 @@ module.exports = (router) => {
 			serverErr(res);
 		}
 	});
-	router.get("/api/books/saved", async (req, res) => {
-		try {
-			let books = await User.findOne({ _id: ObjectId(req.user._id) }).populate("Book");
-			res.json(books).end();
-		} catch (error) {
-			console.error(error);
-			serverErr(res);
-		}
-	});
 	router.put("/api/books/save", async ({ body, user }, res) => {
 		console.log(body, user);
 		try {
@@ -75,5 +66,14 @@ module.exports = (router) => {
 		}
 		let books = await Book.find({ user: ObjectId(req.user._id) });
 		res.json(books).end();
+	});
+	router.delete("/api/books/:id", async (req, res) => {
+		try {
+			let deletion = await Book.findByIdAndDelete(ObjectId(req.params.id));
+			res.json(deletion).end();
+		} catch (error) {
+			console.error(error);
+			serverErr(res);
+		}
 	});
 };
