@@ -7,7 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import Search from "@material-ui/icons/Search";
-import { Link as A, useHistory } from "react-router-dom";
+import { Link as A, useHistory, useLocation } from "react-router-dom";
 import {
 	makeStyles,
 	List,
@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Navbar() {
 	const { user, setUser } = useContext(UserContext);
 	const { setFlash } = useContext(FlashContext);
+	const location = useLocation();
 	const history = useHistory();
 	const classes = useStyles();
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -52,6 +53,11 @@ export default function Navbar() {
 		setFlash(res.flash);
 		history.push("/login");
 	};
+	useEffect(() => {
+		let title = location.pathname.split("/")[1];
+		document.title =
+			location.pathname !== "/" ? title + " - Google Books Search" : "Google Books Search";
+	}, [location.pathname]);
 	const AppDrawer = () => {
 		return (
 			<Drawer variant="temporary" anchor="left" open={drawerOpen} onClose={toggleDrawer}>
