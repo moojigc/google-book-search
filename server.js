@@ -7,7 +7,7 @@ const express = require("express"),
 	{ join } = require("path"),
 	cors = require("cors"),
 	PORT = process.env.PORT || 3300,
-	MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/employee-directory",
+	MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/google-books",
 	prodEnv = process.env.NODE_ENV === "production";
 
 mongoose

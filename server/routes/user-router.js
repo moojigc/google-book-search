@@ -13,6 +13,12 @@ const flash = (message, type) => {
 		}
 	};
 };
+const serverError = (res) => res.json(flash("Internal server error.", "error")).end();
+const guestUser = {
+	_id: null,
+	username: "Guest",
+	auth: false
+};
 
 /**
  * Handles user login, status, registration, etc.
@@ -20,6 +26,7 @@ const flash = (message, type) => {
  */
 module.exports = (router) => {
 	router.post("/api/register", async ({ body }, res) => {
+		console.log(body);
 		const isInvalid =
 			Object.values(body).filter((field) => field === null || field === "").length > 0;
 		if (isInvalid) {
@@ -43,19 +50,29 @@ module.exports = (router) => {
 					redirect: "/login"
 				});
 			} catch (error) {
-				let fields = Object.keys(error.keyValue);
-				let field = fields.length > 0 ? fields[0] : null;
-				res.json({
-					...flash(`User with that ${field} already exists!`, "error"),
-					success: false,
-					redirect: "/register"
-				});
+				let fields = error.keyValue ? Object.keys(error.keyValue) : null;
+				let field = fields > 0 ? fields[0] : null;
+				field
+					? res.json({
+							...flash(`User with that ${field} already exists!`, "error"),
+							success: false,
+							redirect: "/register"
+					  })
+					: serverError(res);
 			}
 		} else {
 			res.json({ ...flash("Passwords must match!", "error"), redirect: "/register" });
 		}
 	});
 	router.post("/api/login", (req, res, next) => {
+		if (!req.body.usernameOrEmail || !req.body.password)
+			return res.json({
+				...flash("Missing fields.", "error"),
+				user: guestUser
+			});
+		req.session.cookie.maxAge = req.body.rememberMe
+			? 60000 * 60 * 24 * 7 * 26
+			: 60000 * 60 * 24;
 		passport.authenticate("local", function (err, user, info) {
 			if (err) {
 				return res.json({
@@ -69,9 +86,7 @@ module.exports = (router) => {
 			if (!user) {
 				return res.json({
 					...flash("User not found.", "error"),
-					user: {
-						auth: false
-					},
+					user: guestUser,
 					redirect: "/login"
 				});
 			}
@@ -85,7 +100,7 @@ module.exports = (router) => {
 						username: user.username,
 						auth: true
 					},
-					...flash(`Welcome, ${req.body.username}!`, "success"),
+					...flash(`Welcome, ${user.username}!`, "success"),
 					redirect: "/"
 				});
 			});

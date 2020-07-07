@@ -1,9 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { Grid, Container, TextField, Button, makeStyles, useMediaQuery } from "@material-ui/core";
+import React, { useState, useRef } from "react";
+import {
+	Grid,
+	Container,
+	TextField,
+	Button,
+	makeStyles,
+	useMediaQuery,
+	CircularProgress,
+	Fade,
+	Box
+} from "@material-ui/core";
 import Wrapper from "../../components/Wrapper";
 import { useBookContext } from "../../utils/BookContext";
 import bookAPI from "../../utils/bookAPI";
 import SearchResult from "../../components/SearchResult";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
 	button: {
@@ -17,12 +28,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Search = () => {
+	const [searchSubmitted, setSearchSubmitted] = useState(false);
 	const isMobile = useMediaQuery("(max-width: 997px)");
 	const classes = useStyles();
 	const [search, setSearch] = useState("rezero");
 	const [results, setResults] = useState([]);
 	const handleSubmit = async (event) => {
 		event.preventDefault();
+		setSearchSubmitted(true);
+		setResults([]);
 		const books = await bookAPI({ action: "search", search: search });
 		setResults(books.items);
 		console.log(books);
@@ -56,11 +70,22 @@ const Search = () => {
 					</Grid>
 				</Grid>
 			</Wrapper>
-			{results.length ? (
+			<Fade in={searchSubmitted}>
 				<Wrapper>
-					<SearchResult books={results} />
+					{results.length ? (
+						<SearchResult books={results} />
+					) : (
+						<Box
+							margin="1rem"
+							display="flex"
+							flexDirection="column"
+							alignItems="center">
+							<CircularProgress size="4rem" />
+							<Typography>Loading results...</Typography>
+						</Box>
+					)}
 				</Wrapper>
-			) : null}
+			</Fade>
 		</Container>
 	);
 };

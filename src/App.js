@@ -6,20 +6,37 @@ import Navbar from "./components/Navbar";
 import { ThemeProvider } from "@material-ui/core/styles/";
 import theme from "./utils/theme";
 import { BookProvider } from "./utils/BookContext";
+import { UserProvider } from "./utils/UserContext";
+import Login from "./pages/Login";
+import UserStatus from "./components/UserStatus";
+import Register from "./pages/Register";
 
 function App() {
 	return (
 		<Router>
-			<ThemeProvider theme={theme}>
-				<BookProvider>
-					<Navbar />
-					<Switch>
-						<Route exact path="/">
-							<Search />
-						</Route>
-					</Switch>
-				</BookProvider>
-			</ThemeProvider>
+			<UserProvider>
+				<UserStatus>
+					<ThemeProvider theme={theme}>
+						<BookProvider>
+							<Navbar />
+							<Switch>
+								<Route exact path="/">
+									<Search />
+								</Route>
+								<Route exact path="/search">
+									<Search />
+								</Route>
+								<Route exact path="/login">
+									<Login />
+								</Route>
+								<Route exact path="/register">
+									<Register />
+								</Route>
+							</Switch>
+						</BookProvider>
+					</ThemeProvider>
+				</UserStatus>
+			</UserProvider>
 		</Router>
 	);
 }
