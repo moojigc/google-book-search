@@ -11,7 +11,12 @@ const express = require("express"),
 	prodEnv = process.env.NODE_ENV === "production";
 
 mongoose
-	.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+	.connect(MONGODB_URI, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+		useCreateIndex: true,
+		useFindAndModify: true
+	})
 	.then((conn) => {
 		if (conn) console.log(`Connected to ${conn.connections[0].db.databaseName}`);
 	})

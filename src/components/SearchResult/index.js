@@ -37,13 +37,16 @@ const useStyles = makeStyles((theme) => ({
 	saveChipOnSuccess: {
 		background: theme.palette.success.dark,
 		color: theme.palette.secondary.contrastText
+	},
+	saveChipOnError: {
+		background: theme.palette.error.light,
+		color: theme.palette.error.contrastText
 	}
 }));
 
 const SearchResult = ({ books }) => {
 	const [user] = useUserContext();
 	const classes = useStyles();
-	const [savedBooks, setSavedBooks] = useState();
 
 	return (
 		<div style={{ width: "100%" }}>
@@ -83,7 +86,7 @@ const SearchResult = ({ books }) => {
 								<AccordionDetails>
 									<Grid container spacing={2}>
 										<Grid item className={classes.description}>
-											<SaveBook book={book} />
+											<SaveBook book={book} classes={classes} />
 											{saleInfo.saleability === "FOR_SALE" ? (
 												<Chip
 													className={classes.priceChip}

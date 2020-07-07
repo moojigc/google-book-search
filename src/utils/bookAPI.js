@@ -3,14 +3,17 @@ import Axios from "axios";
 /**
  *
  * @param {Object} option
- * @param {"search" | "save"} option.action
+ * @param {"search" | "save" | "mybooks"} option.action
+ * @param {string} [option.search]
+ * @param {{}} [option.book]
  */
 export default async function bookAPI({ action, search, book }) {
 	try {
 		let { data } = await Axios({
-			url: `/api/books/${action + search ? "search/" + search : null}`,
-			method: action === "search" ? "GET" : "PUT",
-			data: book
+			url: search ? `/api/books/search/${search}` : `/api/books/${action}`,
+			method: action === "search" || action === "mybooks" ? "GET" : "PUT",
+			data: book,
+			withCredentials: true
 		});
 		return data;
 	} catch (error) {

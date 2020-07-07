@@ -27,38 +27,53 @@ module.exports = (router) => {
 			serverErr(res);
 		}
 	});
-	router.put("/api/books/save", async ({ body }, res) => {
+	router.put("/api/books/save", async ({ body, user }, res) => {
+		console.log(body, user);
 		try {
-			if (body.books.length > 1) {
-				let books = await Book.insertMany(body.books);
+			let book = await Book.findOneAndUpdate(
+				{ googleId: body.googleId, user: ObjectId(user._id) },
+				{
+					...body,
+					user: user._id
+				},
+				{
+					new: true,
+					upsert: true,
+					rawResult: true
+				}
+			);
+			console.log(book);
+			if (!book.lastErrorObject.updatedExisting) {
 				let userInventory = await User.updateOne(
-					{ _id: req.user._id },
+					{ _id: ObjectId(user._id) },
 					{
 						$push: {
-							books: books.map((book) => book._id)
-						}
-					}
-				);
-				if (books && userInventory)
-					res.json(
-						flash(`Saved ${body.books.length} books to your collection!`, "success")
-					).end();
-			} else {
-				let book = await Book.create(body);
-				let userInventory = await User.updateOne(
-					{ _id: req.user._id },
-					{
-						$push: {
-							books: book._id
+							books: book.value._id
 						}
 					}
 				);
 				if (book && userInventory)
-					res.json(flash(`Saved ${body.title} to your collection!`, "success")).end();
+					res.json({
+						...flash(`Saved ${body.title} to your collection!`, "success"),
+						saved: true
+					}).end();
+			} else {
+				res.json({ ...flash("Book already saved.", "error"), saved: true }).end();
 			}
 		} catch (error) {
 			console.error(error);
 			serverErr(res);
 		}
+	});
+	router.get("/api/books/mybooks", async (req, res) => {
+		if (!req.user) {
+			res.json({
+				...flash("Must be logged in to see this page.", "error"),
+				redirect: "/login"
+			});
+			return;
+		}
+		let books = await Book.find({ user: ObjectId(req.user._id) });
+		res.json(books).end();
 	});
 };

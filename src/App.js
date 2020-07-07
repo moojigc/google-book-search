@@ -10,6 +10,7 @@ import { UserProvider } from "./utils/UserContext";
 import Login from "./pages/Login";
 import UserStatus from "./components/UserStatus";
 import Register from "./pages/Register";
+import BookCollection from "./pages/BookCollection";
 
 function App() {
 	return (
@@ -31,6 +32,9 @@ function App() {
 								</Route>
 								<Route exact path="/register">
 									<Register />
+								</Route>
+								<Route exact path="/mybooks">
+									<BookCollection />
 								</Route>
 							</Switch>
 						</BookProvider>

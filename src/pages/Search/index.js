@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
 	Grid,
 	Container,
@@ -11,10 +11,11 @@ import {
 	Box
 } from "@material-ui/core";
 import Wrapper from "../../components/Wrapper";
-import { useBookContext } from "../../utils/BookContext";
 import bookAPI from "../../utils/bookAPI";
 import SearchResult from "../../components/SearchResult";
 import Typography from "@material-ui/core/Typography";
+import { useUserContext } from "../../utils/UserContext";
+import userAPI from "../../utils/userAPI";
 
 const useStyles = makeStyles((theme) => ({
 	button: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Search = () => {
+	const [_, dispatchUser] = useUserContext();
 	const [searchSubmitted, setSearchSubmitted] = useState(false);
 	const isMobile = useMediaQuery("(max-width: 997px)");
 	const classes = useStyles();
@@ -37,9 +39,10 @@ const Search = () => {
 		event.preventDefault();
 		setSearchSubmitted(true);
 		setResults([]);
-		const books = await bookAPI({ action: "search", search: search });
+		let user = await userAPI({ action: "user-status" });
+		let books = await bookAPI({ action: "search", search: search });
 		setResults(books.items);
-		console.log(books);
+		dispatchUser({ user: user });
 	};
 	return (
 		<Container maxWidth={isMobile ? "xl" : "lg"}>
@@ -72,7 +75,7 @@ const Search = () => {
 			</Wrapper>
 			<Fade in={searchSubmitted}>
 				<Wrapper>
-					{results.length ? (
+					{results?.length ? (
 						<SearchResult books={results} />
 					) : (
 						<Box
